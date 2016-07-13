@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html>
+<html>
+@{
+    var posts = PostRepository.GetPublishedPostsByDate(30);
+}
+<head>
+    <title>Free HTML5 Templates</title>
+    <meta name="description" content="website description" />
+    <meta name="keywords" content="website keywords, website keywords" />
+    <meta http-equiv="content-type" content="text/html; charset=windows-1252" />
+
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <!-- modernizr enables HTML5 elements and feature detects -->
+    <script src="~/js/modernizr-1.5.min.js"></script>
+
+</head>
+
+<body>
+    <div id="main">
+        <header>
+            @if (WebUser.IsAuthenticated)
+            {
+                <div style="float: left; margin-left: 20px; margin-top: 50px; color:white;"> <img src="~/Images/lefticon.png" /></div>
+                <div style="float: right; margin-right: 20px; margin-top: 110px; color:white;"><a style="color:white;" href="~/Logout.cshtml">Logout</a></div>
+
+            }
+            @if (!WebUser.IsAuthenticated)
+            {
+                <div id="login" style="float: right; margin-right: 20px; margin-top: 110px; color: #f4efef;"><a style="color:white;" href="~/Login.cshtml">Login</a></div>
+            }
+
+
+            <div id="strapline">
+                <div id="welcome_slogan">
+                    @if (!WebUser.IsAuthenticated)
+                    {
+                        <h3>Welcome To My <span>Website</span></h3>
+                    }
+                    @if (WebUser.IsAuthenticated)
+                    {
+                        <h3><span>Welcome To Your </span>Website</h3>
+                    }
+                </div><!--close welcome_slogan-->
+            </div><!--close strapline-->
+            <nav>
+                <div id="menubar">
+                    <ul id="nav">
+                        <li class="current"><a href="~/">Home</a></li>
+                      <!--  <li><a href="~/admin/">Admin</a></li>-->
+                        <!--  <li><a href="testimonials.html">Testimonials</a></li>
+                           <li><a href="projects.html">Projects</a></li>-->
+                        <li><a href="~/contact.cshtml">Contact Us</a></li>
+                        <li><a href="~/contact.cshtml">About Us</a></li>
+
+                    </ul>
+                </div><!--close menubar-->
+            </nav>
+        </header>
+        <div id="slideshow_container">
+        @RenderSection("slideshow_container", false)
+            <div class="slideshow">
+                <ul class="slideshow">
+                    <li class="show"><img width="940" height="250" src="~/Images/home_1.jpg" alt="&quot;Enter your caption here&quot;" /></li>
+                    <li><img width="940" height="250" src="~/Images/home_2.jpg" alt="&quot;Enter your caption here&quot;" /></li>
+                </ul>
+            </div><!--close slideshow-->
+        </div><!--close slideshow_container-->
+
+        <div id="site_content">
+            @RenderSection("site_content", false)
+            <div class="sidebar_container">
+                <div class="sidebar">
+                    <div class="sidebar_item">
+                        <h2>New Website</h2>
+                        <p>Welcome to our new website. Please have a look around, any feedback is much appreciated.</p>
+                    </div><!--close sidebar_item-->
+                </div><!--close sidebar-->
+                <div class="sidebar">
+                    <div class="sidebar_item">
+                        <h3>Last Update</h3>
+                        @foreach (var post in posts)
+                        {
+                            <h2><a href="/archive/post/@post.Slug">@post.Title</a></h2>
+                        }
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque cursus tempor enim.</p>
+                    </div><!--close sidebar_item-->
+                </div><!--close sidebar-->
+                <div class="sidebar">
+                    <div class="sidebar_item">
+                        <h3>February 2013</h3>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque cursus tempor enim.</p>
+                    </div><!--close sidebar_item-->
+                </div><!--close sidebar-->
+                <div class="sidebar">
+                    <div class="sidebar_item">
+                        <h2>Contact</h2>
+                        <p>Phone: +98 (0)1234 567891</p>
+                        <p>Email: <a href="mailto:info@youremail.co.uk">info@youremail.com</a></p>
+                    </div><!--close sidebar_item-->
+                </div><!--close sidebar-->
+            </div><!--close sidebar_container-->
+            <div id="content">
+                <div id="body">
+                    @RenderSection("featured", required: false)
+                    <section class="content-wrapper main-content clear-fix ">
+                        @RenderBody()
+                    </section>
+                </div>
+            </div><!--close content-->
+        </div><!--close site_content-->
+
+        <footer>
+            <a href="index.html">Home</a> | <a href="ourwork.html">Our Work</a> | <a href="testimonials.html">Testimonials</a> | <a href="projects.html">Projects</a> | <a href="contact.html">Contact</a><br /><br />
+            <a href="http://fotogrph.com">Images</a> |  <a href="http://www.heartinternet.co.uk/vps/">Virtual Server</a>  | website template by <a href="http://www.freehtml5templates.co.uk">Free HTML5 Templates</a>
+        </footer>
+
+    </div><!--close main-->
+    <!-- javascript at the bottom for fast page loading -->
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/image_slide.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,11 @@
+﻿@{
+    var md = PageData[1];
+}
+<div>
+    <div class="single-blog-post sm-left-error" dir="rtl">
+        <h3>@Model.Title</h3>
+
+        <p>@Html.Raw(md.Transform(Model.SectionFirst))</p>
+        <a class="btn btn-primary " href="~/archive/post/@Model.Slug"> ادامه مطلب </a>
+    </div>
+</div>

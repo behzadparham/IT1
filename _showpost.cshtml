@@ -1,0 +1,79 @@
+﻿@{
+    Page.Title = "Title goes here";
+    //Layout = "Your Layout Page goes here";
+    var md = PageData[1];
+    var mode = Account.Mode;
+    var post = Post.Current;
+    var result = string.Empty;
+    if (IsPost)
+    {
+        AntiForgery.Validate();
+        var name = Request.Form["commentName"];
+        var email = Request.Form["commentEmail"];
+        var message = Request.Form["commentMessage"];
+        var postId = Request.Form["postid"];
+        CommentRepository.AddComment(name, email, message, Convert.ToInt32(postId));
+        result = "دیدگاه شما ارسال گردید پس از تایید نمایش داده خواهد شد";
+    }
+
+    /*  var db = WebMatrix.Data.Database.Open("DefaultConnection");
+      var sql = "SELECT * FROM Posts WHERE Id=@0";
+      var result=db.Query(sql, 1);*/
+
+}
+<div class="category-tab shop-details-tab" dir="rtl">
+    <!--category-tab-->
+    <div class="col-sm-12">
+        <ul class="nav nav-tabs">
+            <li data-toggle="tab"><a data-toggle="tab"></a></li>
+        </ul>
+    </div>
+    <center>
+        <div>
+            <h4>@Model.Title</h4>
+        </div>
+    </center>
+    <div class="tab-content">
+        <div class="tab-pane fade active in" id="reviews">
+            <div class="col-sm-12">
+                <ul>
+                    <li><a href=""><i class="fa fa-user"></i>مدیریت</a></li>
+                    <li><a href=""><i class="fa fa-clock-o"></i> @Model.DateCreated.Minute : @Model.DateCreated.Hour</a></li>
+                    <li><a href=""><i class="fa fa-calendar-o"></i>@Model.DateCreated.Year @Model.DateCreated.Month @Model.DateCreated.Day</a></li>
+                </ul>
+                @Html.Raw(md.Transform(Model.Content))
+                <h4>دیدگاه ها</h4>
+                <p style="color:#ff6a00; font-family:'B Nazanin'">@result</p>
+
+                @{
+                    var comments = CommentRepository.GetCommentsForPosts(post.Id);
+                    foreach (var comment in comments)
+                    {
+                        if (comment.Visible == 1)
+                        {
+                            <div class="commnets">
+                                <p style="color:#ff6a00"> @comment.Name</p>
+                                <p>@comment.Message</p>
+                            </div>
+                        }
+                    }
+                }
+
+                <p><b>نظر دهید</b></p>
+
+                <form name="contact" method="post">
+                    @AntiForgery.GetHtml()
+                    <input type="hidden" name="postid" value="@post.Id" />
+                    <span>
+                        <input type="text" name="commentName" required="required" placeholder="نام شما" />
+                        <input type="email" name="commentEmail" required="required" placeholder="ایمیل" />
+                    </span>
+                    <textarea name="commentMessage" required="required"></textarea>
+                    <input type="submit" value="ارسال" class="btn btn-default pull-right" />
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!--/categor-->

@@ -1,0 +1,74 @@
+﻿@{
+    Page.Title = "Login";
+    Layout = "~/Site/_Layout.cshtml";
+    var message = string.Empty;
+    if (IsPost)
+    {
+        var username = Request.Form["username"];
+        var password = Request.Form["password"];
+        if (WebUser.AuthenticateAndLogin(username, password))
+        {
+            if (WebUser.HasRole(UserRoles.Author))
+            {
+                Response.Redirect("~/");
+            }
+            Response.Redirect("~/admin/");
+        }
+        message = "نام کاربری یا رمز ورود اشتباه است ";
+    }
+}
+<!--
+<div class="error">message</div>
+<div id="content">
+    <div class="content_item">
+        <div class="form_settings">
+            <form name="login" method="post">
+                <p><span>Username:</span><input class="contact" type="text" name="username" /></p>
+                <p><span>Password:</span><input class="contact" type="password" name="password"/></p>
+
+                <p style="padding-top: 15px"><span>&nbsp;</span><input class="submit" type="submit" value="Login" /></p>
+            </form>
+        </div><!--close form_settings--
+    </div><!--close content_item--
+</div><!--close content--
+<div>
+   Not yet a Member?&nbsp; <a href="~/register.cshtml">Register Now</a>
+</div>-->
+<!----<section id="form">
+    <!--form--
+   <!----<div class="container">
+        <div class="row">-->
+<div class="error sm-left-error">
+<p style="color:#ff6a00">@message</p>
+</div>
+<div class="col-sm-4 sm-left">
+    <div class="login-form">
+        <!--login form-->
+        <h2>ورود به حساب کاربری</h2>
+
+        <form name="login" method="post">
+            <input type="text" placeholder="نام کاربری" name="username" />
+            <input type="password" placeholder="گذزواژه" name="password" />
+            <input type="submit" class="submit" value="ورود" />
+        </form>
+    <h2 ><a style="color:#ff6a00" href="~/register.cshtml"> ثبت نام کاربر جدید </a></h2>
+    </div><!--/login form-->
+</div>
+<!--  <div class="col-sm-1">
+       <h2 class="or">OR</h2>
+   </div>
+   <div class="col-sm-4">
+       <div class="signup-form">
+           <!--sign up form--
+           <h2>New User Signup!</h2>
+           <form action="#">
+               <input type="text" placeholder="Name" />
+               <input type="email" placeholder="Email Address" />
+               <input type="password" placeholder="Password" />
+               <button type="submit" class="btn btn-default">Signup</button>
+           </form>
+       </div><!--/sign up form--
+   </div>--
+</div>
+    </div>
+</section><!--/form-->

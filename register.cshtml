@@ -1,0 +1,208 @@
+﻿@{
+
+
+    Page.Title = "Title goes here";
+    Layout = "~/Site/_LayoutHome.cshtml";
+    var account = Account.Current;
+
+
+    var username = Request.Form["registerName"];
+    var password1 = Request.Form["registerPassword1"];
+    var password2 = Request.Form["registerPassword2"];
+    var id = Request.Form["registerId"];
+    var email = Request.Form["registerEmail"];
+    int roles = 5;
+    var message = string.Empty;
+
+    var result = "";
+    Validation.Add("registerName",
+        Validator.Required("نام کاربری خود را وارد کنید"));
+    Validation.Add("registerEmail",
+    Validator.Regex(@"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$",
+    "ایمیل وارد شده صحیح نمی باشد")
+    );
+    Validation.RequireField("registerPassword1", "گذرواژه خود را وارد کنید");
+    Validation.Add("registerPassword1", Validator.Regex(@"[a-zA-Z0-9]{6,20}", "طول گذر واژه باید مابین 6 تا 20 کاراکتر باشد"));
+    Validation.Add("registerPassword2",
+        Validator.EqualsTo("registerPassword1", "دو گذرواژه با هم مطابقت ندارند")
+        );
+
+    if (IsPost)
+    {
+        var result2 = RegisterRepository.Get(username);
+        if (result2 != null)
+        {
+            result = "نام کاربری قبلا وجود دارد";
+        }
+
+        if (Validation.IsValid() && (result2 == null))
+        {
+
+            RegisterHandler.Create(username, password1, email, roles);
+
+
+            try
+            {
+                string strBody = string.Empty;
+
+                strBody += string.Format("<b>Full Name</b>: {0}<br />", username);
+                strBody += string.Format("<b>E-Mail</b>: <a href='mailto:{0}'>{0}</a><br />", email);
+                strBody += string.Format("<b>Subject</b>: {0}<br />", "عضویت در وب سایت");
+                strBody += string.Format("<b>Description</b>: {0}<br />", "مضخرفات");
+
+
+                System.Net.Mail.MailMessage oMailMessage =
+                    new System.Net.Mail.MailMessage();
+
+                System.Net.Mail.MailAddress oMailAddress = null;
+
+                oMailAddress =
+                    new System.Net.Mail.MailAddress
+                        (
+                            "farid.omarzadeh29@gmail.com",
+                            "Auto Response Email Sender",
+                            System.Text.Encoding.UTF8
+                        );
+
+                oMailMessage.From = oMailAddress;
+                oMailMessage.Sender = oMailAddress;
+
+                oMailMessage.To.Clear();
+                oMailMessage.CC.Clear();
+                oMailMessage.Bcc.Clear();
+                oMailMessage.ReplyToList.Clear();
+                oMailMessage.Attachments.Clear();
+
+
+
+                oMailMessage.ReplyToList.Add(oMailAddress);
+
+                //میتونیم شخص یا اشخاص دیگری را به غیر از خودمون مشخص کنیم
+                //که ایمیل را دریافت کنند
+                //مثل خود شخصی که متن را ارسال نموده است
+                oMailAddress =
+                    new System.Net.Mail.MailAddress
+                        (
+                            email,
+                            username,
+                            System.Text.Encoding.UTF8
+                        );
+
+                oMailMessage.To.Add(oMailAddress);
+
+                oMailMessage.BodyEncoding = System.Text.Encoding.UTF8;
+                oMailMessage.Body = strBody;
+
+                oMailMessage.SubjectEncoding = System.Text.Encoding.UTF8;
+
+
+                oMailMessage.Subject =
+                    "[-<Company Name>-] - " + "WebDesign";
+
+                oMailMessage.IsBodyHtml = true;
+
+                oMailMessage.Priority =
+                    System.Net.Mail.MailPriority.Normal;
+
+                //نحوه پیام دادن سیستم در مورد ایمیل ارسالی را مشخص میکنیم
+                //پنج حالت دارد که اگر ترکیب حالات مد نظر باشد باید دستو ذیل به تعداد نوشته و با هم اور شوند
+                oMailMessage.DeliveryNotificationOptions =
+                    System.Net.Mail.DeliveryNotificationOptions.Never;
+
+
+                //با استفاده از تبدیل مسیر نسبی به فیزیکی
+                //پیوستی برای ایمیل در نظر میگیریم
+
+                //مسیر فیزیکی نسبت به روت
+                string strRootRelativePathName = "~/Attachments/Attachment.png";
+
+                //تبدیل مسیر نسبی به فیزیکی
+                string strPathName =
+                    Server.MapPath(strRootRelativePathName);
+
+                if (System.IO.File.Exists(strPathName))
+                {
+                    System.Net.Mail.Attachment oAttachment =
+                        new System.Net.Mail.Attachment(strPathName);
+
+                    oMailMessage.Attachments.Add(oAttachment);
+                }
+
+                //در محیط میل سرور های عمومی وقتی ایمیل ارسال میشود پروتکل اچ تی تی پی است
+                //اما در محیط خارجی
+                //اس ام تی پی برای ارسال و پاپ تری برای دریافت ایمیل است
+
+                //یک شی از اس ام تی پی ایجاد میکنیم
+                System.Net.Mail.SmtpClient oSmtpClient =
+                    new System.Net.Mail.SmtpClient();
+
+                //تایم اوت پیش فرض یعنی صد ثانیه را برای ارسال ایمیل در نظر میگیریم
+                //زمان برقراری ارتباط است اگر بیشتر شود پیغام خطا داده میشود
+                oSmtpClient.Timeout = 100000;
+
+                //امضا الکترونیکی ایمیل را مشخص میکنیم
+                //سکیوت ساکت لایر -انتقال امن دیتا در جی میل که اولین ارائه کننده این سرویس است رایگان است
+                //اگر جی میل در نظر میگیرید حتما این گزینه را تورو قرار دهید
+
+                oSmtpClient.Host = "smtp.gmail.com";
+                oSmtpClient.EnableSsl = true;
+                oSmtpClient.DeliveryMethod = System.Net.Mail.SmtpDeliveryMethod.Network;
+                NetworkCredential NetworkCred = new NetworkCredential("farid.omarzadeh29@gmail.com", "2741277532");
+                oSmtpClient.UseDefaultCredentials = false;
+                oSmtpClient.Credentials = NetworkCred;
+                oSmtpClient.Port = 587;
+
+                //شی میل مسیج را به متد سند شی اس ام تی پی میدیم
+                oSmtpClient.Send(oMailMessage);
+
+
+
+
+            }
+            catch (System.Exception ex)
+            {
+                result = ex.Message;
+            }
+
+       //     Response.Redirect("~/");
+                result = "ثبت نام شما با موفقیت انجام شد لطفا به صفحه ورود مراجعه کنید";
+
+            
+
+        }
+    }
+}
+
+
+<!----
+<section id="form" dir="rtl">-->
+
+<div class="error sm-left-error">
+    <p style="color: #fdb45e;margin-left:40px;"> @Html.Raw(result)</p>
+    <p style="color: #fdb45e; margin-left:40px;"> @Html.ValidationSummary(true)</p>
+    <p style="color: #fdb45e; margin-left: 40px;">  @Html.ValidationMessage("registerName")</p>
+    <p style="color: #fdb45e; margin-left: 40px;"> @Html.ValidationMessage("registerPassword1")</p>
+
+    <p style="color: #fdb45e; margin-left: 40px;">@Html.ValidationMessage("registerPassword2")</p>
+
+    <p style="color: #fdb45e; margin-left: 40px;"> @Html.ValidationMessage("registerEmail")</p>
+
+</div>
+<div class="col-sm-4 sm-left" style="height:100px">
+    <div class="signup-form" dir="rtl">
+        <!--sign up form-->
+        <h2>ثبت نام کاربر جدید</h2>
+        <form name="register" method="post">
+            <p> <input type="hidden" value="account.Id" name="accountId" /></p>
+            <p> <input type="text" name="registerName" placeholder="نام" value="@Request["registerName"]" /></p>
+            <p> <input type="email" name="registerEmail" placeholder="ایمیل" value="@Request["registerEmail"]" /></p>
+            <p> <input type="password" placeholder="گذرواژه" name="registerPassword1" value="" /></p>
+            <p> <input type="password" placeholder="تایید گذرواژه" name="registerPassword2" value="" /></p>
+
+            <button type="submit" name="registerSubmit" class="btn btn-default">ثبت نام</button>
+        </form><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+    </div>
+</div>
+<!----
+
+</section><!--/form-->

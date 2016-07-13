@@ -1,0 +1,28 @@
+﻿@{
+    Layout = "~/Site/_LayoutHome.cshtml";
+    var mode = Post.Mode;
+}
+<div>
+    @if(mode=="post")
+    { 
+    @RenderPage("~/_showpost.cshtml",Post.Current, new MarkdownSharp.Markdown());
+    }
+    else if(mode=="comment")
+    {
+        var posts = PostRepository.GetPublishedPostsByTag(Tag.FriendlyName);
+        foreach(var post in posts)
+        {
+                @RenderPage("~/_post.cshtml", post, new MarkdownSharp.Markdown());
+
+        }
+    }
+    else if(string.IsNullOrEmpty(mode))
+    {
+        var posts = PostRepository.GetPublishedPostsByDate(30);
+        foreach (var post in posts)
+        {
+            @RenderPage("~/_post.cshtml", post, new MarkdownSharp.Markdown());
+
+        }
+    }
+</div>
